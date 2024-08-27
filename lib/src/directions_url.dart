@@ -25,7 +25,7 @@ String getMapDirectionsUrl({
               '${origin?.latitude},${origin?.longitude}',
             ),
             'daddr':
-                '${destination.latitude},${destination.longitude}${waypoints?.map((waypoint) => '+to:${waypoint.latitude},${waypoint.longitude}').join('') ?? ''}',
+                '${waypoints?.map((waypoint) => '+to:${waypoint.latitude},${waypoint.longitude}').join('') ?? ''}${destination.latitude},${destination.longitude}',
             'directionsmode': Utils.enumToString(directionsMode),
             ...(extraParams ?? {}),
           },
