@@ -16,23 +16,39 @@ String getMapDirectionsUrl({
 }) {
   switch (mapType) {
     case MapType.google:
-      return Utils.buildUrl(
-        url: 'https://www.google.com/maps/dir/',
-        queryParams: {
-          'api': '1',
-          'destination': '${destination.latitude},${destination.longitude}',
-          'origin': Utils.nullOrValue(
-            origin,
-            '${origin?.latitude},${origin?.longitude}',
-          ),
-          'waypoints': waypoints
-              ?.map((waypoint) => '${waypoint.latitude},${waypoint.longitude}')
-              .join('|'),
-          'travelmode': Utils.enumToString(directionsMode),
-          ...(extraParams ?? {}),
-        },
-      );
-
+      if (Platform.isIOS) {
+        return Utils.buildUrl(
+          url: 'comgooglemaps://',
+          queryParams: {
+            'saddr': Utils.nullOrValue(
+              origin,
+              '${origin?.latitude},${origin?.longitude}',
+            ),
+            'daddr':
+                '${destination.latitude},${destination.longitude}${waypoints?.map((waypoint) => '+to:${waypoint.latitude},${waypoint.longitude}').join('') ?? ''}',
+            'directionsmode': Utils.enumToString(directionsMode),
+            ...(extraParams ?? {}),
+          },
+        );
+      } else {
+        return Utils.buildUrl(
+          url: 'https://www.google.com/maps/dir/',
+          queryParams: {
+            'api': '1',
+            'destination': '${destination.latitude},${destination.longitude}',
+            'origin': Utils.nullOrValue(
+              origin,
+              '${origin?.latitude},${origin?.longitude}',
+            ),
+            'waypoints': waypoints
+                ?.map(
+                    (waypoint) => '${waypoint.latitude},${waypoint.longitude}')
+                .join('|'),
+            'travelmode': Utils.enumToString(directionsMode),
+            ...(extraParams ?? {}),
+          },
+        );
+      }
     case MapType.googleGo:
       return Utils.buildUrl(
         url: 'https://www.google.com/maps/dir/',
