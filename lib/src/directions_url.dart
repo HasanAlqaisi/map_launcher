@@ -17,6 +17,22 @@ String getMapDirectionsUrl({
   switch (mapType) {
     case MapType.google:
       if (Platform.isIOS) {
+        String daddr = '';
+
+        if (waypoints == null || waypoints.isEmpty) {
+          daddr = '${destination.latitude},${destination.longitude}';
+        } else {
+          for (int i = 0; i < waypoints.length; i++) {
+            final waypoint = waypoints[i];
+            if (i == 0) {
+              daddr += '${waypoint.latitude},${waypoint.longitude}';
+            } else {
+              daddr += '+to:${waypoint.latitude},${waypoint.longitude}';
+            }
+          }
+          daddr += '+to:${destination.latitude},${destination.longitude}';
+        }
+
         return Utils.buildUrl(
           url: 'comgooglemaps://',
           queryParams: {
@@ -24,8 +40,7 @@ String getMapDirectionsUrl({
               origin,
               '${origin?.latitude},${origin?.longitude}',
             ),
-            'daddr':
-                '${waypoints?.map((waypoint) => '+to:${waypoint.latitude},${waypoint.longitude}').join('') ?? ''}${destination.latitude},${destination.longitude}',
+            'daddr': daddr,
             'directionsmode': Utils.enumToString(directionsMode),
             ...(extraParams ?? {}),
           },
